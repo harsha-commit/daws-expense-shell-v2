@@ -1,32 +1,9 @@
 #!/bin/bash
 
-USERID=$(id -u)
-TIMESTAMP=$(date +%F-%H-%M-%S)
-SCRIPTNAME=$(echo $0 | cut -d '.' -f 1)
-LOGFILE="/tmp/$SCRIPTNAME-$TIMESTAMP.log"
-R="\e[31m"
-G="\e[32m"
-Y="\e[33m"
-W="\e[0m"
+source ./common.sh
+
 echo "Enter MySQL DB Password:"
 read -s mysql_root_password # ExpenseApp@1
-
-VALIDATE(){
-    if [ $1 -ne 0 ]
-    then
-        echo -e "$2 ...$R FAILED $W"
-    else
-        echo -e "$2 ...$G SUCCESS $W"
-    fi
-}
-
-if [ $USERID -ne 0 ]
-then
-    echo "Please run this script as super user"
-    exit 1
-else
-    echo "Running this script as super user"
-fi
 
 dnf module disable nodejs -y &>> $LOGFILE
 VALIDATE $? "Disabling default NodeJS"
@@ -60,7 +37,7 @@ VALIDATE $? "Unzipping the file"
 npm install &>> $LOGFILE
 VALIDATE $? "Installing NodeJS dependencies"
 
-cp /home/ec2-user/daws-expense-shell/backend.service /etc/systemd/system/ &>> $LOGFILE
+cp /home/ec2-user/daws-expense-shell-v2/backend.service /etc/systemd/system/ &>> $LOGFILE
 VALIDATE $? "Copying Backend Configuration"
 
 systemctl daemon-reload &>> $LOGFILE
